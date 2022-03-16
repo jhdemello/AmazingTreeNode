@@ -1,70 +1,77 @@
+import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 public class Main {
+	static AmazingTreeNode<Atom> atoms = new AmazingTreeNode<>();
+
 	public static void main(String args[])
 		throws CloneNotSupportedException
 	{
-		AmazingTreeNode<Integer> t1 = new AmazingTreeNode<>();
-		t1.a = 10;
-		t1.b = 20;
+	    List<Atom> atomList = new ArrayList<>();
+		atomList.add(new Atom("John Galt", "John Galt"));
+		atomList.add(new Atom("Ragnar Danneskjold", "John Galt"));
+		atomList.add(new Atom("Dagny Taggart", "John Galt"));
+		atomList.add(new Atom("Francisco d\'Anconia", "John Galt"));
+		atomList.add(new Atom("Hank Reardon", "Ragnar Danneskjold"));
+		atomList.add(new Atom("Eddie Willers", "Ragnar Danneskjold"));
+		atomList.add(new Atom("Ken Dannager", "Ragnar Danneskjold"));
+		atomList.add(new Atom("James Taggart", "Dagny Taggart"));
+		atomList.add(new Atom("Lillie Reardon", "Francisco d\'Anconia"));
+		atomList.add(new Atom("Robert Stadler", "Francisco d\'Anconia"));
+		atomList.add(new Atom("Cherryl Brooks", "Francisco d\'Anconia"));
 
-		Node<Integer> node1 = new Node<>();
-		node1.x = 30;
-		node1.y = 40;
-		t1.c.add(node1);
+		System.out.print("\n=======================================================");
+		System.out.println("======================================================");
+		System.out.println("== Building tree from list");
+		System.out.println("== ");
+		IntStream.range(0, atomList.size()).forEachOrdered(i -> {
+			atomList.get(i).printAtom();
+			String strParent = atomList.get(i).mgr;
+			String strEmployee = atomList.get(i).emp;
+			if (strEmployee.equalsIgnoreCase(strParent)) {
+				atoms = new AmazingTreeNode<Atom>(strParent);
+			}
+			else {
+				AmazingTreeNode<Atom> atom = atoms.get(strParent);
+				atom.insert(strEmployee);
+			}
+		});
+		System.out.println("== ");
 
-		System.out.print("[T1.printTree()(T1 init):: ");
-		t1.printTree();
+		atoms.printTree();
 
-		AmazingTreeNode<Integer> t3 = (AmazingTreeNode<Integer>)t1.clone();
-		System.out.print("[T1.printTree()(T3.clone(T1)):: ");
-		t1.printTree();
+		// MOVE TESTING
+		String JG = "John Galt";
+		String DT = "Dagny Taggart";
+		String JT = "James Taggart";
+		String RD = "Ragnar Danneskjold";
+		String KD = "Ken Dannager";
+		String RS = "Robert Stadler";
+		String FD = "Francisco d\'Anconia";
 
-		t3.a = 100;
+		// MOVE: Promote James Taggart to VP
+		atoms.move(JT, DT, JG);
+		atoms.printTree();
 
-		System.out.print("[T1.printTree()(T3.a = 100)]:: ");
-		t1.printTree();
+		// MOVE: Demote Ragnar from VP to Office Admin (promoting all of Ragnar's direct
+		// reports to VP!?)
+		atoms.move(RD, JG, DT);
+		atoms.printTree();
 
-		System.out.print("[T3.printTree()(T3.a = 100)]:: ");
-		t3.printTree();
+		// MOVE: Build up Dagny's team a bit. Move Ken from John to Dagny
+		atoms.move(KD, JG, DT);
+		atoms.printTree();
 
-		node1.x = 300;
-		node1.y = 400;
+		// MOVE: Move Jim to Ken (this should add a 4th level to the tree)
+		atoms.move(RS, FD, KD);
+		atoms.printTree();
 
-		System.out.println("(node1.x = 300, node1.y = 400) ----- ");
-		System.out.print("[T1.printTree()]:: ");
-		t1.printTree();
-		System.out.print("[T3.printTree()](SANS node1):: ");
-		t3.printTree();
-
-		t3.c.add(node1);
-		System.out.print("[T3.printTree()](ADDED node1):: ");
-		t3.printTree();
-
-		System.out.println("NEW NODE1(node1.x = 3000, node1.y = 4000) ----- ");
-		node1 = new Node<>();
-		node1.x = 3000;
-		node1.y = 4000;
-
-		System.out.print("[T1.printTree()](pre-Add):: ");
-		t1.printTree();
-		System.out.print("[T3.printTree()](pre-Add):: ");
-		t3.printTree();
-
-		t3.c.add(node1);
-
-		System.out.print("[T1.printTree()](post-Add):: ");
-		t1.printTree();
-		System.out.print("[T3.printTree()](post-Add):: ");
-		t3.printTree();
-
-		AmazingTreeNode<Integer> t4 = new AmazingTreeNode<>();
-		System.out.print("[T4.printTree()](T4 <- T3):: ");
-		t4 = (AmazingTreeNode<Integer>)t3.copy(t3);
-		t4.printTree();
-
-		System.out.print("[T4.printTree()](post copy)T4 <- T3):: ");
-		t3.c.get(0).x = 5555555;
-		t4.printTree();
+		// Dagny found a new opportunity, we've found an AMAZING new candidate with a bit more
+		// moxy.
+		AmazingTreeNode<Atom> atom = atoms.get(DT);
+		atom.printTree();
+		atom.get(DT).id = "Bugs Bunny";
+		atoms.printTree();
 	}
 }
